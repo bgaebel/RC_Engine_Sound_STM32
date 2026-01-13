@@ -1,0 +1,7 @@
+../Core/Src/rcInput.c:19:17:rcInputGetActiveChannel	16	static
+../Core/Src/rcInput.c:36:16:rcInputFindIndex	24	static
+../Core/Src/rcInput.c:55:6:rcInputInit	24	static
+../Core/Src/rcInput.c:99:6:rcInputStart	8	static
+../Core/Src/rcInput.c:124:6:rcInputProcessCapture	40	static
+../Core/Src/rcInput.c:179:6:rcInputUpdate	24	static
+../Core/Src/rcInput.c:196:14:rcInputGetState	24	static

@@ -1,0 +1,10 @@
+../Core/Src/engineModel.c:10:17:engineModelMap	24	static
+../Core/Src/engineModel.c:26:17:engineModelComputeThrottle	24	static
+../Core/Src/engineModel.c:46:13:engineModelUpdateThrottleFade	4	static
+../Core/Src/engineModel.c:58:13:engineModelUpdateVolumes	16	static
+../Core/Src/engineModel.c:138:13:engineModelUpdateRpm	32	static
+../Core/Src/engineModel.c:175:13:engineModelUpdateWastegate	16	static
+../Core/Src/engineModel.c:193:6:engineModelInit	4	static
+../Core/Src/engineModel.c:219:6:engineModelUpdate	16	static
+../Core/Src/engineModel.c:246:18:engineModelGetState	24	static
+../Core/Src/engineModel.c:257:6:engineModelConsumeWastegateTrigger	16	static

@@ -1,0 +1,5 @@
+../Core/Src/stm32g4xx_hal_msp.c:64:6:HAL_MspInit	1
+../Core/Src/stm32g4xx_hal_msp.c:91:6:HAL_I2S_MspInit	4
+../Core/Src/stm32g4xx_hal_msp.c:158:6:HAL_I2S_MspDeInit	2
+../Core/Src/stm32g4xx_hal_msp.c:190:6:HAL_TIM_IC_MspInit	3
+../Core/Src/stm32g4xx_hal_msp.c:256:6:HAL_TIM_IC_MspDeInit	3

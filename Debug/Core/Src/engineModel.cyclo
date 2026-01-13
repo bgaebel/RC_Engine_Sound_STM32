@@ -1,0 +1,10 @@
+../Core/Src/engineModel.c:10:17:engineModelMap	3
+../Core/Src/engineModel.c:26:17:engineModelComputeThrottle	5
+../Core/Src/engineModel.c:46:13:engineModelUpdateThrottleFade	5
+../Core/Src/engineModel.c:58:13:engineModelUpdateVolumes	5
+../Core/Src/engineModel.c:138:13:engineModelUpdateRpm	7
+../Core/Src/engineModel.c:175:13:engineModelUpdateWastegate	4
+../Core/Src/engineModel.c:193:6:engineModelInit	1
+../Core/Src/engineModel.c:219:6:engineModelUpdate	2
+../Core/Src/engineModel.c:246:18:engineModelGetState	1
+../Core/Src/engineModel.c:257:6:engineModelConsumeWastegateTrigger	1
