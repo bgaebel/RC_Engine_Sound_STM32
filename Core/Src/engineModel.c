@@ -61,34 +61,34 @@ static void engineModelUpdateVolumes(void)
     engineState.currentThrottleFaded,
     0U,
     500U,
-    soundData.engineIdleVolumePercentage,
-    soundData.fullThrottleVolumePercentage);
+    (uint16_t)engineIdleVolumePercentage,
+    (uint16_t)fullThrottleVolumePercentage);
 
   engineState.throttleDependentRevVolume = engineModelMap(
     engineState.currentThrottleFaded,
     0U,
     500U,
-    soundData.engineRevVolumePercentage,
-    soundData.fullThrottleVolumePercentage);
+    (uint16_t)engineRevVolumePercentage,
+    (uint16_t)fullThrottleVolumePercentage);
 
-  if (engineState.currentThrottleFaded > soundData.dieselKnockStartPoint)
+  if (engineState.currentThrottleFaded > (uint16_t)dieselKnockStartPoint)
   {
     engineState.throttleDependentKnockVolume = engineModelMap(
       engineState.currentThrottleFaded,
-      soundData.dieselKnockStartPoint,
+      (uint16_t)dieselKnockStartPoint,
       500U,
-      soundData.dieselKnockIdleVolumePercentage,
+      (uint16_t)dieselKnockIdleVolumePercentage,
       100U);
   }
   else
   {
-    if (engineState.throttleDependentKnockVolume > soundData.dieselKnockIdleVolumePercentage)
+    if (engineState.throttleDependentKnockVolume > (uint16_t)dieselKnockIdleVolumePercentage)
     {
       engineState.throttleDependentKnockVolume--;
     }
     else
     {
-      engineState.throttleDependentKnockVolume = soundData.dieselKnockIdleVolumePercentage;
+      engineState.throttleDependentKnockVolume = (uint16_t)dieselKnockIdleVolumePercentage;
     }
   }
 
@@ -96,42 +96,42 @@ static void engineModelUpdateVolumes(void)
     engineState.currentRpm,
     0U,
     500U,
-    soundData.turboIdleVolumePercentage,
+    (uint16_t)turboIdleVolumePercentage,
     100U);
 
-  if (engineState.currentRpm > soundData.fanStartPoint)
+  if (engineState.currentRpm > (uint16_t)fanStartPoint)
   {
     engineState.throttleDependentFanVolume = engineModelMap(
       engineState.currentRpm,
-      soundData.fanStartPoint,
+      (uint16_t)fanStartPoint,
       500U,
-      soundData.fanIdleVolumePercentage,
+      (uint16_t)fanIdleVolumePercentage,
       100U);
   }
   else
   {
-    engineState.throttleDependentFanVolume = soundData.fanIdleVolumePercentage;
+    engineState.throttleDependentFanVolume = (uint16_t)fanIdleVolumePercentage;
   }
 
-  if (engineState.currentRpm > soundData.chargerStartPoint)
+  if (engineState.currentRpm > (uint16_t)chargerStartPoint)
   {
     engineState.throttleDependentChargerVolume = engineModelMap(
       engineState.currentThrottleFaded,
-      soundData.chargerStartPoint,
+      (uint16_t)chargerStartPoint,
       500U,
-      soundData.chargerIdleVolumePercentage,
+      (uint16_t)chargerIdleVolumePercentage,
       100U);
   }
   else
   {
-    engineState.throttleDependentChargerVolume = soundData.chargerIdleVolumePercentage;
+    engineState.throttleDependentChargerVolume = (uint16_t)chargerIdleVolumePercentage;
   }
 
   engineState.rpmDependentWastegateVolume = engineModelMap(
     engineState.currentRpm,
     0U,
     500U,
-    soundData.wastegateIdleVolumePercentage,
+    (uint16_t)wastegateIdleVolumePercentage,
     100U);
 }
 
@@ -144,9 +144,9 @@ static void engineModelUpdateRpm(void)
     targetRpm = 500U;
   }
 
-  if (targetRpm > (engineState.currentRpm + soundData.accelerationStep) && engineState.currentRpm < 500U)
+  if (targetRpm > (uint16_t)(engineState.currentRpm + (uint16_t)acc) && engineState.currentRpm < 500U)
   {
-    engineState.currentRpm = (uint16_t)(engineState.currentRpm + soundData.accelerationStep);
+    engineState.currentRpm = (uint16_t)(engineState.currentRpm + (uint16_t)acc);
     if (engineState.currentRpm > 500U)
     {
       engineState.currentRpm = 500U;
@@ -155,9 +155,9 @@ static void engineModelUpdateRpm(void)
 
   if (targetRpm < engineState.currentRpm)
   {
-    if (engineState.currentRpm > soundData.decelerationStep)
+    if (engineState.currentRpm > (uint16_t)dec)
     {
-      engineState.currentRpm = (uint16_t)(engineState.currentRpm - soundData.decelerationStep);
+      engineState.currentRpm = (uint16_t)(engineState.currentRpm - (uint16_t)dec);
     }
     else
     {
@@ -165,8 +165,8 @@ static void engineModelUpdateRpm(void)
     }
   }
 
-  uint32_t maxSampleInterval = (4000000U / soundData.engineSampleRate);
-  uint32_t minSampleInterval = (maxSampleInterval * 100U) / soundData.maxRpmPercentage;
+  uint32_t maxSampleInterval = (4000000U / (uint32_t)sampleRate);
+  uint32_t minSampleInterval = (maxSampleInterval * 100U) / MAX_RPM_PERCENTAGE;
   uint32_t interval = engineModelMap(engineState.currentRpm, 0U, 500U, (uint16_t)maxSampleInterval, (uint16_t)minSampleInterval);
 
   engineState.engineSampleIntervalTicks = (uint16_t)interval;
@@ -197,13 +197,13 @@ void engineModelInit(void)
   engineState.currentThrottleFaded = 0U;
   engineState.currentRpm = 0U;
   engineState.engineSampleIntervalTicks = 0U;
-  engineState.throttleDependentVolume = soundData.engineIdleVolumePercentage;
-  engineState.throttleDependentRevVolume = soundData.engineRevVolumePercentage;
-  engineState.throttleDependentKnockVolume = soundData.dieselKnockIdleVolumePercentage;
-  engineState.throttleDependentTurboVolume = soundData.turboIdleVolumePercentage;
-  engineState.throttleDependentFanVolume = soundData.fanIdleVolumePercentage;
-  engineState.throttleDependentChargerVolume = soundData.chargerIdleVolumePercentage;
-  engineState.rpmDependentWastegateVolume = soundData.wastegateIdleVolumePercentage;
+  engineState.throttleDependentVolume = (uint16_t)engineIdleVolumePercentage;
+  engineState.throttleDependentRevVolume = (uint16_t)engineRevVolumePercentage;
+  engineState.throttleDependentKnockVolume = (uint16_t)dieselKnockIdleVolumePercentage;
+  engineState.throttleDependentTurboVolume = (uint16_t)turboIdleVolumePercentage;
+  engineState.throttleDependentFanVolume = (uint16_t)fanIdleVolumePercentage;
+  engineState.throttleDependentChargerVolume = (uint16_t)chargerIdleVolumePercentage;
+  engineState.rpmDependentWastegateVolume = (uint16_t)wastegateIdleVolumePercentage;
   engineState.signalValid = false;
   lastThrottle = 0U;
   wastegateMillis = 0U;

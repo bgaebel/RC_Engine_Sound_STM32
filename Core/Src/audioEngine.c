@@ -132,31 +132,31 @@ static int32_t audioEngineRenderFrame(void)
     audioEngineTriggerKnock(engineSampleIndex);
   }
 
-  if ((engineSampleIndex - lastKnockSampleIndex) > (soundData.engineSampleCount / soundData.dieselKnockInterval))
+  if ((engineSampleIndex - lastKnockSampleIndex) > (sampleCount / (uint32_t)dieselKnockInterval))
   {
     audioEngineTriggerKnock(engineSampleIndex);
   }
 
   lastEngineSampleIndex = engineSampleIndex;
 
-  int32_t idleSample = audioEngineInterpolateLinear(soundData.engineSamples, soundData.engineSampleCount, enginePhase);
+  int32_t idleSample = audioEngineInterpolateLinear(samples, sampleCount, enginePhase);
   int32_t idleLayer = (idleSample * (int32_t)idleVolume) / 100;
   int32_t a = idleLayer;
 
-  if (soundData.revSamples != NULL && soundData.revSampleCount > 0U)
+  if (revSampleCount > 0U)
   {
-    int32_t revSample = audioEngineInterpolateLinear(soundData.revSamples, soundData.revSampleCount, enginePhase);
+    int32_t revSample = audioEngineInterpolateLinear(revSamples, revSampleCount, enginePhase);
     int32_t revLayer = (revSample * (int32_t)revVolume) / 100;
-    uint16_t idleBlend = soundData.idleVolumeProportionPercentage;
+    uint16_t idleBlend = (uint16_t)idleVolumeProportionPercentage;
 
-    if (currentRpm > soundData.revSwitchPoint && soundData.idleEndPoint > soundData.revSwitchPoint)
+    if (currentRpm > revSwitchPoint && idleEndPoint > revSwitchPoint)
     {
-      uint16_t mapped = (uint16_t)((soundData.idleVolumeProportionPercentage * (soundData.idleEndPoint - currentRpm)) /
-        (soundData.idleEndPoint - soundData.revSwitchPoint));
+      uint16_t mapped = (uint16_t)(((uint32_t)idleVolumeProportionPercentage * (idleEndPoint - currentRpm)) /
+        (idleEndPoint - revSwitchPoint));
       idleBlend = mapped;
     }
 
-    if (currentRpm > soundData.idleEndPoint)
+    if (currentRpm > idleEndPoint)
     {
       idleBlend = 0U;
     }
@@ -170,7 +170,7 @@ static int32_t audioEngineRenderFrame(void)
   if (knockActive)
   {
     uint32_t previousPhase = knockPhase;
-    b += audioEngineMixLayer(soundData.knockSamples, soundData.knockSampleCount, &knockPhase, fixedPhaseInc, knockVolume);
+    b += audioEngineMixLayer(knockSamples, knockSampleCount, &knockPhase, fixedPhaseInc, knockVolume);
     if (knockPhase < previousPhase)
     {
       knockActive = false;
@@ -180,23 +180,23 @@ static int32_t audioEngineRenderFrame(void)
   if (wastegateActive)
   {
     uint32_t previousPhase = wastegatePhase;
-    b += audioEngineMixLayer(soundData.wastegateSamples, soundData.wastegateSampleCount, &wastegatePhase, wastegatePhaseInc, wastegateVolume);
+    b += audioEngineMixLayer(wastegateSamples, wastegateSampleCount, &wastegatePhase, wastegatePhaseInc, wastegateVolume);
     if (wastegatePhase < previousPhase)
     {
       wastegateActive = false;
     }
   }
 
-  int32_t c = audioEngineMixLayer(soundData.turboSamples, soundData.turboSampleCount, &turboPhase, enginePhaseInc, turboVolume);
-  int32_t d = audioEngineMixLayer(soundData.fanSamples, soundData.fanSampleCount, &fanPhase, enginePhaseInc, fanVolume);
-  int32_t e = audioEngineMixLayer(soundData.chargerSamples, soundData.chargerSampleCount, &chargerPhase, enginePhaseInc, chargerVolume);
+  int32_t c = audioEngineMixLayer(turboSamples, turboSampleCount, &turboPhase, enginePhaseInc, turboVolume);
+  int32_t d = audioEngineMixLayer(fanSamples, fanSampleCount, &fanPhase, enginePhaseInc, fanVolume);
+  int32_t e = audioEngineMixLayer(chargerSamples, chargerSampleCount, &chargerPhase, enginePhaseInc, chargerVolume);
   int32_t f = 0;
   int32_t g = 0;
 
-  audioEngineAdvancePhase(&enginePhase, enginePhaseInc, soundData.engineSampleCount);
+  audioEngineAdvancePhase(&enginePhase, enginePhaseInc, sampleCount);
 
   int32_t mix = (a * 8 / 10) + (b / 2) + (c / 5) + (d / 5) + (e / 5) + f + g;
-  mix = (mix * (int32_t)soundData.masterVolume) / 100;
+  mix = (mix * (int32_t)masterVolume) / 100;
 
   int32_t sample16 = mix * 256;
   sample16 = audioEngineClamp(sample16, -32768, 32767);
@@ -228,21 +228,21 @@ void audioEngineInit(I2S_HandleTypeDef *i2sHandle)
   chargerPhase = 0U;
   knockPhase = 0U;
   wastegatePhase = 0U;
-  enginePhaseInc = audioEnginePhaseIncrement(soundData.engineSampleRate);
-  fixedPhaseInc = audioEnginePhaseIncrement(soundData.knockSampleRate);
-  wastegatePhaseInc = audioEnginePhaseIncrement(soundData.wastegateSampleRate);
+  enginePhaseInc = audioEnginePhaseIncrement(sampleRate);
+  fixedPhaseInc = audioEnginePhaseIncrement(knockSampleRate);
+  wastegatePhaseInc = audioEnginePhaseIncrement(wastegateSampleRate);
   lastEngineSampleIndex = 0U;
   lastKnockSampleIndex = 0U;
   knockActive = false;
   wastegateActive = false;
 
-  idleVolume = soundData.engineIdleVolumePercentage;
-  revVolume = soundData.engineRevVolumePercentage;
-  knockVolume = soundData.dieselKnockIdleVolumePercentage;
-  turboVolume = soundData.turboIdleVolumePercentage;
-  fanVolume = soundData.fanIdleVolumePercentage;
-  chargerVolume = soundData.chargerIdleVolumePercentage;
-  wastegateVolume = soundData.wastegateIdleVolumePercentage;
+  idleVolume = (uint16_t)engineIdleVolumePercentage;
+  revVolume = (uint16_t)engineRevVolumePercentage;
+  knockVolume = (uint16_t)dieselKnockIdleVolumePercentage;
+  turboVolume = (uint16_t)turboIdleVolumePercentage;
+  fanVolume = (uint16_t)fanIdleVolumePercentage;
+  chargerVolume = (uint16_t)chargerIdleVolumePercentage;
+  wastegateVolume = (uint16_t)wastegateIdleVolumePercentage;
   currentRpm = 0U;
 }
 
@@ -275,20 +275,20 @@ void audioEngineControlTick(uint32_t nowMs)
   EngineModelState state = engineModelGetState();
   currentRpm = state.currentRpm;
 
-  uint32_t engineSampleRate = soundData.engineSampleRate;
+  uint32_t engineSampleRate = sampleRate;
   if (state.engineSampleIntervalTicks != 0U)
   {
     engineSampleRate = 4000000U / state.engineSampleIntervalTicks;
   }
   enginePhaseInc = audioEnginePhaseIncrement(engineSampleRate);
 
-  idleVolume = (uint16_t)((state.throttleDependentVolume * soundData.idleVolumePercentage) / 100U);
-  revVolume = (uint16_t)((state.throttleDependentRevVolume * soundData.revVolumePercentage) / 100U);
-  knockVolume = (uint16_t)((state.throttleDependentKnockVolume * soundData.dieselKnockVolumePercentage) / 100U);
-  turboVolume = (uint16_t)((state.throttleDependentTurboVolume * soundData.turboVolumePercentage) / 100U);
-  fanVolume = (uint16_t)((state.throttleDependentFanVolume * soundData.fanVolumePercentage) / 100U);
-  chargerVolume = (uint16_t)((state.throttleDependentChargerVolume * soundData.chargerVolumePercentage) / 100U);
-  wastegateVolume = (uint16_t)((state.rpmDependentWastegateVolume * soundData.wastegateVolumePercentage) / 100U);
+  idleVolume = (uint16_t)((state.throttleDependentVolume * (uint32_t)idleVolumePercentage) / 100U);
+  revVolume = (uint16_t)((state.throttleDependentRevVolume * (uint32_t)revVolumePercentage) / 100U);
+  knockVolume = (uint16_t)((state.throttleDependentKnockVolume * (uint32_t)dieselKnockVolumePercentage) / 100U);
+  turboVolume = (uint16_t)((state.throttleDependentTurboVolume * (uint32_t)turboVolumePercentage) / 100U);
+  fanVolume = (uint16_t)((state.throttleDependentFanVolume * (uint32_t)fanVolumePercentage) / 100U);
+  chargerVolume = (uint16_t)((state.throttleDependentChargerVolume * (uint32_t)chargerVolumePercentage) / 100U);
+  wastegateVolume = (uint16_t)((state.rpmDependentWastegateVolume * (uint32_t)wastegateVolumePercentage) / 100U);
 
   if (engineModelConsumeWastegateTrigger())
   {

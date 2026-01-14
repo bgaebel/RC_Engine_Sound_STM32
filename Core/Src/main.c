@@ -107,7 +107,8 @@ int main(void)
   MX_TIM2_Init();
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
-
+  rcInputInit(&htim2, &htim3);
+  rcInputStart();
   /* USER CODE END 2 */
 
   /* Initialize led */
@@ -142,6 +143,25 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    static uint32_t lastPrintMs = 0U;
+    uint32_t nowMs = HAL_GetTick();
+
+    rcInputUpdate(nowMs);
+
+    if ((nowMs - lastPrintMs) >= 200U)
+    {
+      RcInputState rcState = rcInputGetState();
+      lastPrintMs = nowMs;
+      printf("RC PWM us: CH1=%u%s CH2=%u%s CH3=%u%s CH4=%u%s\r\n",
+        rcState.pulseWidthUs[0],
+        rcState.signalValid[0] ? "" : " (n/a)",
+        rcState.pulseWidthUs[1],
+        rcState.signalValid[1] ? "" : " (n/a)",
+        rcState.pulseWidthUs[2],
+        rcState.signalValid[2] ? "" : " (n/a)",
+        rcState.pulseWidthUs[3],
+        rcState.signalValid[3] ? "" : " (n/a)");
+    }
   }
   /* USER CODE END 3 */
 }

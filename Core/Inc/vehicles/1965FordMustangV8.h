@@ -10,6 +10,7 @@ volatile int startVolumePercentage = 90; // Adjust the start volume (usually = 1
 uint32_t idleVolumePercentage = 80; // Adjust the idle volume (usually = 100%, more also working, depending on sound, 50 - 60% if additional diesel knock sound is used)
 uint32_t engineIdleVolumePercentage = 80; // the engine volume will be throttle dependent (usually = 40%, never more than 100%!)
 uint32_t fullThrottleVolumePercentage = 170; // Volume Percentage while full throttle (for rev sound as well)
+uint16_t masterVolume = 100; // Overall output volume (usually = 100%)
 //#include "sounds/1965FordMustangV8idle.h" // 1965 Ford Mustang V8
 #include "sounds/1965FordMustangV8idleLowpass.h" // 1965 Ford Mustang V8
 
