@@ -1,13 +1,5 @@
 #include "soundData.h"
 
-// Core engine sound assets (Volvo L120H configuration)
-#include "../../src/vehicles/sounds/L120H_BaumaIdleOutside.h"
-#include "../../src/vehicles/sounds/L120H_BaumaKnock.h"
-#include "../../src/vehicles/sounds/TurboWhistle.h"
-#include "../../src/vehicles/sounds/GenericFan.h"
-#include "../../src/vehicles/sounds/supercharger.h"
-#include "../../src/vehicles/sounds/UnimogU1000TurboWastegate.h"
-
 const SoundData soundData = {
   .engineSamples = samples,
   .engineSampleCount = sampleCount,
